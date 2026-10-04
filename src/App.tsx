@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState, type SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import { getLaundryServices } from "./services/laundry-services";
 import { ServiceCard } from "./components/service-card";
 import OrderSummary from "./components/order-summary";
@@ -9,22 +9,27 @@ import { createOrder } from "./services/order-services";
 
 import type { LaundryService } from "./services/types/laundry";
 import type { CartItem, CustomerDetails, Order } from "./services/types/order";
+import { Typography } from "@heroui/react";
 
-function App() {
+const DEFAULT_CUSTOMER_DETAILS: CustomerDetails = {
+  name: "",
+  email: "",
+  phone: "",
+};
+
+const App = () => {
   const [services, setServices] = useState<LaundryService[]>([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [customerDetails, setCustomerDetails] =
-    useState<CustomerDetails | null>(null);
-  const [step, setStep] = useState(1);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails>(
+    DEFAULT_CUSTOMER_DETAILS,
+  );
+  const [step, setStep] = useState<LaundryStep>("selection");
   const [order, setOrder] = useState<Order | undefined>(undefined);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState("");
 
   const handlePlaceOrder = async () => {
-    if (!customerDetails) {
-      return;
-    }
     try {
       setPlacingOrder(true);
       setOrderError("");
@@ -35,7 +40,7 @@ function App() {
       });
 
       setOrder(createdOrder);
-      setStep(4);
+      setStep("details");
     } catch (error) {
       console.error("Failed to create order:", error);
 
@@ -45,15 +50,13 @@ function App() {
     }
   };
 
-  const handleBookingSubmit = (
-    form: SetStateAction<CustomerDetails | null>,
-  ) => {
+  const handleBookingSubmit = (form: CustomerDetails) => {
     setCustomerDetails(form);
-    setStep(3);
+    setStep("review");
   };
 
   const addService = () => {
-    setStep(1);
+    setStep("selection");
   };
 
   const handleAddToOrder = (service: {
@@ -62,7 +65,7 @@ function App() {
     price: number;
     unit: string;
   }) => {
-    setStep(2);
+    setStep("summary");
     setCart((currentCart: CartItem[]) => {
       const existingItem = currentCart.some(
         (item) => item.serviceId === service.id,
@@ -99,7 +102,7 @@ function App() {
       );
 
       if (updated.length === 0) {
-        setStep(1);
+        setStep("selection");
       }
 
       return updated;
@@ -143,16 +146,34 @@ function App() {
     return <p>Loading...</p>;
   }
 
+  //--Description Enum--
+
+  type LaundryStep = "selection" | "summary" | "review" | "details";
+
+  const DESCRIPTION_TEXT: Record<LaundryStep, string> = {
+    selection:
+      " Welcome to our laundry service! Track your laundry from start to finish with ease.",
+    review: "Review your selected services before continuing",
+    summary: "Review your selected services before continuing.",
+    details: "Enter your details so we can process your laundry.",
+  };
+
   return (
-    <div className="px-5">
-      <h1>Laundry App</h1>
-      <p>Welcome to our laundry service.</p>
+    <div className="p-5">
+      <Typography.Heading className="mb-3" level={1}>
+        Hello,
+      </Typography.Heading>
+      <Typography.Paragraph className="mb-3">
+        {DESCRIPTION_TEXT[step]}
+      </Typography.Paragraph>
 
-      {step === 1 && (
+      {step === "selection" && (
         <div>
-          <h1>Laundry Services</h1>
+          <Typography.Paragraph color="muted" size="sm" className="mb-3">
+            {cart.length === 0 ? "Service offered" : "Select Additional"} :
+          </Typography.Paragraph>
 
-          <div className="grid grid-flow-col grid-rows-2 gap-5">
+          <div className="grid grid-cols-2 gap-4">
             {services.map((service: LaundryService) => (
               <ServiceCard
                 key={service.id}
@@ -164,7 +185,7 @@ function App() {
         </div>
       )}
 
-      {step === 2 && (
+      {(step === "summary" || cart.length !== 0) && (
         <>
           <OrderSummary
             cart={cart}
@@ -172,16 +193,17 @@ function App() {
             onRemove={handleRemoveFromOrder}
             onUpdateQuantity={handleUpdateQuantity}
           />
+
           <BookingForm onSubmit={handleBookingSubmit} />
         </>
       )}
 
-      {step === 3 && (
+      {step === "review" && (
         <>
           <OrderReview
             cart={cart}
             customerDetails={customerDetails}
-            onBack={() => setStep(2)}
+            onBack={() => setStep("summary")}
             onPlaceOrder={handlePlaceOrder}
             placingOrder={placingOrder}
           />
@@ -189,7 +211,7 @@ function App() {
         </>
       )}
 
-      {step === 4 && (
+      {step === "details" && (
         <>
           <hr />
 
@@ -208,6 +230,6 @@ function App() {
       )}
     </div>
   );
-}
+};
 
 export default App;

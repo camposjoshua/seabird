@@ -1,17 +1,20 @@
 import { Button, Card, Input, Label, TextField } from "@heroui/react";
 import { useState } from "react";
+import type { ChangeEvent, SubmitEvent } from "react";
+import type { CustomerDetails } from "../services/types/order";
 
-export const BookingForm = ({ onSubmit }) => {
-  const [form, setForm] = useState({
+type BookingFormProps = {
+  onSubmit: (form: CustomerDetails) => void;
+};
+
+export const BookingForm = ({ onSubmit }: BookingFormProps) => {
+  const [form, setForm] = useState<CustomerDetails>({
     name: "",
     email: "",
     phone: "",
-    address: "",
-    pickupDate: "",
-    pickupTime: "",
   });
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     setForm((currentForm) => ({
@@ -20,7 +23,7 @@ export const BookingForm = ({ onSubmit }) => {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
 
     onSubmit(form);

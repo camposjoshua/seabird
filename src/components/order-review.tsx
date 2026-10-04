@@ -1,11 +1,25 @@
+import type { CartItem, CustomerDetails } from "../services/types/order";
+
+type OrderReviewProps = {
+  cart: CartItem[];
+  customerDetails: CustomerDetails;
+  onBack: () => void;
+  onPlaceOrder: () => void;
+  placingOrder: boolean;
+};
+
 export const OrderReview = ({
   cart,
   customerDetails,
   onBack,
   onPlaceOrder,
   placingOrder,
-}) => {
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+}: OrderReviewProps) => {
+  const total = cart.reduce(
+    (sum: number, item: { price: number; quantity: number }) =>
+      sum + item.price * item.quantity,
+    0,
+  );
 
   return (
     <div>

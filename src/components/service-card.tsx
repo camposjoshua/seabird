@@ -1,9 +1,15 @@
 import { Button, Card } from "@heroui/react";
+import type { LaundryService } from "../services/types/laundry";
 
-export const ServiceCard = ({ service, onSelect }) => {
+type ServiceCardProps = {
+  service: LaundryService;
+  onSelect: (service: LaundryService) => void;
+};
+
+export const ServiceCard = ({ service, onSelect }: ServiceCardProps) => {
   return (
     <Card className="w-full items-stretch md:flex-row">
-      <div className="relative h-[140px] w-full shrink-0 overflow-hidden rounded-2xl sm:h-[120px] sm:w-[120px]">
+      <div className="display-none relative shrink-0 overflow-hidden rounded-2xl md:h-[120px] md:w-[120px]">
         <img
           alt="Cherries"
           className="pointer-events-none absolute inset-0 h-full w-full scale-125 object-cover select-none"
@@ -27,7 +33,7 @@ export const ServiceCard = ({ service, onSelect }) => {
             onPress={() => onSelect(service)}
             className="w-full sm:w-auto"
           >
-            Apply Now
+            Select Service
           </Button>
         </Card.Footer>
       </div>
