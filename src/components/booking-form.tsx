@@ -37,7 +37,7 @@ export const BookingForm = ({ onSubmit }: BookingFormProps) => {
       </Card.Header>
 
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mb-4">
           <TextField name="email" type="email" isRequired>
             <Label>Email</Label>
             <Input

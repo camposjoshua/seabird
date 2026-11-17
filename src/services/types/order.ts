@@ -7,6 +7,13 @@ export type OrderStatus =
   | "completed"
   | "cancelled";
 
+export type OrderTracking = {
+  trackingId: string;
+  orderNumber: string;
+  status: OrderStatus;
+  statusHistory: StatusHistoryItem[];
+};
+
 export type CustomerDetails = {
   name: string;
   email: string;
@@ -40,6 +47,7 @@ export type Order = {
   status: OrderStatus;
   statusHistory: StatusHistoryItem[];
   createdAt: Timestamp | null;
+  trackingLink?: string;
 };
 
 export type OrderFirestore = Omit<Order, "id" | "createdAt"> & {
