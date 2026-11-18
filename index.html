@@ -5,6 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/seabird/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BookEz</title>
+    <script>
+      const redirect = window.location.search;
+
+      if (redirect.startsWith("?/")) {
+        const path = redirect.slice(2).split("&")[0].replace(/~and~/g, "&");
+
+        window.history.replaceState(
+          null,
+          "",
+          "/seabird/" + path + window.location.hash,
+        );
+      }
+    </script>
     <script type="module" crossorigin src="/seabird/assets/index-CB_3Wg8y.js"></script>
     <link rel="stylesheet" crossorigin href="/seabird/assets/index-B2p_Y9gC.css">
   </head>
