@@ -42,7 +42,10 @@ export const createOrder = async ({
   const orderNumber = generateOrderNumber();
   const trackingToken = generateTrackingToken();
 
-  const trackingLink = `${window.location.origin}/track/${trackingToken}`;
+  const trackingLink = `${window.location.origin}${import.meta.env.BASE_URL}track/${trackingToken}`;
+
+  console.log("BASE URL:", import.meta.env.BASE_URL);
+  console.log("TRACKING LINK:", trackingLink);
 
   const orderRef = doc(collection(db, "orders"));
   const trackingRef = doc(db, "publicTracking", trackingToken);
