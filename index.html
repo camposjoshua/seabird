@@ -6,16 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BookEz</title>
     <script>
-      const redirect = window.location.search;
+      const redirect = sessionStorage.redirect;
 
-      if (redirect.startsWith("?/")) {
-        const path = redirect.slice(2).split("&")[0].replace(/~and~/g, "&");
+      if (redirect) {
+        delete sessionStorage.redirect;
 
-        window.history.replaceState(
-          null,
-          "",
-          "/seabird/" + path + window.location.hash,
-        );
+        window.history.replaceState(null, "", "/seabird" + redirect);
       }
     </script>
     <script type="module" crossorigin src="/seabird/assets/index-gmIHpaSn.js"></script>

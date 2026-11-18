@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>BookEz</title>
+    <script>
+      const base = "/seabird";
+      const path = window.location.pathname;
+
+      const route = path.startsWith(base) ? path.slice(base.length) : path;
+
+      sessionStorage.redirect =
+        route + window.location.search + window.location.hash;
+
+      window.location.replace(base + "/");
+    </script>
+  </head>
+  <body></body>
+</html>
