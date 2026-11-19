@@ -2,18 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getOrderTracking } from "../services/order-tracking";
 import type { OrderStatus, OrderTracking } from "../services/types/order";
+import { Surface, Typography } from "@heroui/react";
+import { formatOrderNumber } from "../features/order-tracker/utils/format-order-number";
+import { Stepper } from "../components/stepper";
 
-const ORDER_STATUSES: OrderStatus[] = [
-  "received",
-  "processing",
-  "ready",
-  "completed",
-  "cancelled",
-];
+const ORDER_STATUSES: OrderStatus[] = ["received", "preparing", "ready"];
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   received: "Order Received",
-  processing: "Confirmed",
+  preparing: "Preparing",
   ready: "Ready for Pickup",
   completed: "Completed",
   cancelled: "Cancelled",
@@ -82,45 +79,39 @@ const OrderTracker = () => {
     );
   }
 
-  const currentStatusIndex = ORDER_STATUSES.indexOf(order.status);
-
   return (
-    <main>
-      <h1>Laundry Tracker</h1>
-
-      <h2>Order #{order.orderNumber}</h2>
-
-      <p>
-        Current Status:{" "}
-        <strong>{STATUS_LABELS[order.status] ?? order.status}</strong>
-      </p>
-
-      <hr />
-
-      <h3>Order Progress</h3>
-
-      {ORDER_STATUSES.map((status, index) => {
-        const isCompleted = index <= currentStatusIndex;
-        const isCurrent = index === currentStatusIndex;
-
-        const historyEntry = order.statusHistory.find(
-          (entry) => entry.status === status,
-        );
-
-        return (
-          <div key={status}>
-            <p>
-              {isCompleted ? "✓" : "○"} <strong>{STATUS_LABELS[status]}</strong>
-              {isCurrent && " — In Progress"}
-            </p>
-
-            {historyEntry?.timestamp && (
-              <small>{new Date(historyEntry.timestamp).toLocaleString()}</small>
-            )}
+    <div className="w-full min-h-screen bg-blue-100">
+      <div className="p-5">
+        <Surface className="flex flex-col w-full rounded-3xl shadow-surface p-5 gap-5">
+          <div>
+            <Typography type="body" className="">
+              Order number:
+            </Typography>
+            <Typography type="h2">
+              {formatOrderNumber(order.orderNumber)}
+            </Typography>
           </div>
-        );
-      })}
-    </main>
+          <div>
+            <Typography type="body" className="">
+              status:
+            </Typography>
+            <Typography type="h3">
+              {STATUS_LABELS[order.status] ?? order.status}
+            </Typography>
+          </div>
+
+          <div>
+            <Typography type="body-sm" className="mb-3">
+              progress:
+            </Typography>
+            <Stepper
+              currentStep={ORDER_STATUSES.indexOf(order.status)}
+              steps={ORDER_STATUSES}
+            />
+          </div>
+        </Surface>
+      </div>
+    </div>
   );
 };
 

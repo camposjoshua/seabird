@@ -2,7 +2,7 @@ import { FieldValue, Timestamp } from "firebase/firestore";
 
 export type OrderStatus =
   | "received"
-  | "processing"
+  | "preparing"
   | "ready"
   | "completed"
   | "cancelled";
