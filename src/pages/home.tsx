@@ -1,7 +1,7 @@
 import "../App.css";
 import { useEffect, useState } from "react";
 
-import { Typography } from "@heroui/react";
+import { Header, Surface, Typography } from "@heroui/react";
 import { OrderConfirmation } from "../components/order-confirmation";
 import { Stepper } from "../components/stepper";
 import { BookingForm } from "../components/booking-form";
@@ -46,6 +46,7 @@ export const Home = () => {
   const [orderError, setOrderError] = useState("");
 
   const [downPayment, setDownPayment] = useState(0);
+  const [showAdditionalService, setShowAdditionalService] = useState(false);
   const [isDownPaymentEnabled, setIsDownPaymentEnabled] = useState(false);
 
   const onSetDownPayment = (downpayment: number) => {
@@ -92,7 +93,7 @@ export const Home = () => {
   };
 
   const addService = () => {
-    setStep(0);
+    setShowAdditionalService(!showAdditionalService);
   };
 
   const onSelectBranch = (selectedBranch: Branch["id"]) => {
@@ -105,7 +106,12 @@ export const Home = () => {
     price: number;
     unit: string;
   }) => {
-    setStep(1);
+    if (step !== 1) {
+      setStep(1);
+    } else {
+      setShowAdditionalService(false);
+    }
+
     setCart((currentCart: CartItem[]) => {
       const existingItem = currentCart.some(
         (item) => item.serviceId === service.id,
@@ -219,6 +225,20 @@ export const Home = () => {
 
       {step === 1 && cart.length !== 0 && (
         <>
+          {showAdditionalService && (
+            <Surface className="flex flex-col w-full rounded-3xl shadow-surface p-5 gap-5 mb-5">
+              <Header>Select additional Service:</Header>
+              <div className="grid grid-cols-2 gap-4">
+                {services.map((service: LaundryService) => (
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    onSelect={handleAddToOrder}
+                  />
+                ))}
+              </div>
+            </Surface>
+          )}
           <OrderSummary
             cart={cart}
             branch={branchId}
