@@ -103,19 +103,21 @@ export const OrderReview = ({
 
       <hr />
 
-      <div className=" flex flex-row justify-between items-center my-3">
-        <div>
-          <Typography className="text-orange-500" type="body-sm">
-            Down payment:
-          </Typography>
-        </div>
+      {downPayment !== 0 && (
+        <div className=" flex flex-row justify-between items-center my-3">
+          <div>
+            <Typography className="text-orange-500" type="body-sm">
+              Down payment:
+            </Typography>
+          </div>
 
-        <div>
-          <Typography className="text-orange-500" type="body-sm">
-            - ₱{downPayment}
-          </Typography>
+          <div>
+            <Typography className="text-orange-500" type="body-sm">
+              - ₱{downPayment}
+            </Typography>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className=" flex flex-row justify-between items-center my-3">
         <div>
