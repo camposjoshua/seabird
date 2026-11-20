@@ -43,6 +43,8 @@ export type Order = {
   trackingToken: string;
   customer: CustomerDetails;
   items: OrderItem[];
+  branchId: string;
+  downPayment: number;
   total: number;
   status: OrderStatus;
   statusHistory: StatusHistoryItem[];
@@ -57,4 +59,6 @@ export type OrderFirestore = Omit<Order, "id" | "createdAt"> & {
 export type CreateOrderParams = {
   cart: CartItem[];
   customerDetails: CustomerDetails;
+  branchId: string;
+  downPayment: number;
 };

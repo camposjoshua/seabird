@@ -38,6 +38,8 @@ const generateTrackingToken = () => {
 export const createOrder = async ({
   cart,
   customerDetails,
+  branchId,
+  downPayment,
 }: CreateOrderParams): Promise<Order> => {
   const orderNumber = generateOrderNumber();
   const trackingToken = generateTrackingToken();
@@ -46,11 +48,19 @@ export const createOrder = async ({
 
   console.log("BASE URL:", import.meta.env.BASE_URL);
   console.log("TRACKING LINK:", trackingLink);
+  console.log(branchId);
 
   const orderRef = doc(collection(db, "orders"));
   const trackingRef = doc(db, "publicTracking", trackingToken);
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const appliedDownPayment = Math.min(Math.max(0, downPayment || 0), subtotal);
+
+  const total = subtotal - appliedDownPayment;
 
   const statusHistory: StatusHistoryItem[] = [
     {
@@ -78,6 +88,8 @@ export const createOrder = async ({
       subtotal: item.price * item.quantity,
     })),
 
+    branchId,
+    downPayment: appliedDownPayment,
     total,
     status: "received",
     statusHistory,

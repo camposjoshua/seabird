@@ -12,6 +12,7 @@ import { getLaundryServices } from "../services/laundry-services";
 import { createOrder } from "../services/order-create";
 import type { LaundryService } from "../services/types/laundry";
 import type { CustomerDetails, CartItem, Order } from "../services/types/order";
+import type { Branch } from "../services/types/branch";
 
 const DEFAULT_CUSTOMER_DETAILS: CustomerDetails = {
   name: "",
@@ -37,12 +38,27 @@ export const Home = () => {
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>(
     DEFAULT_CUSTOMER_DETAILS,
   );
+  const [branchId, setBranchId] = useState<Branch["id"]>("");
+  const [branchError, setBranchError] = useState("");
   const [step, setStep] = useState(0);
   const [order, setOrder] = useState<Order | undefined>(undefined);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState("");
 
+  const [downPayment, setDownPayment] = useState(0);
+  const [isDownPaymentEnabled, setIsDownPaymentEnabled] = useState(false);
+
+  const onSetDownPayment = (downpayment: number) => {
+    setDownPayment(Number(downpayment));
+  };
+
   const handlePlaceOrder = async () => {
+    if (!branchId) {
+      setBranchError("Please select a branch.");
+      setStep(1);
+      return;
+    }
+
     try {
       setPlacingOrder(true);
       setOrderError("");
@@ -50,14 +66,14 @@ export const Home = () => {
       const createdOrder = await createOrder({
         cart,
         customerDetails,
+        branchId,
+        downPayment,
       });
 
       setOrder(createdOrder);
       setStep(3);
     } catch (error) {
-      console.log(error);
       console.error("Failed to create order:", error);
-
       setOrderError("We couldn't place your order. Please try again.");
     } finally {
       setPlacingOrder(false);
@@ -65,12 +81,22 @@ export const Home = () => {
   };
 
   const handleBookingSubmit = (form: CustomerDetails) => {
+    if (!branchId) {
+      setBranchError("Please select a branch before continuing.");
+      return;
+    }
+
+    setBranchError("");
     setCustomerDetails(form);
     setStep(2);
   };
 
   const addService = () => {
     setStep(0);
+  };
+
+  const onSelectBranch = (selectedBranch: Branch["id"]) => {
+    setBranchId(selectedBranch);
   };
 
   const handleAddToOrder = (service: {
@@ -195,7 +221,14 @@ export const Home = () => {
         <>
           <OrderSummary
             cart={cart}
+            branch={branchId}
+            downPayment={downPayment}
+            branchError={branchError}
+            isDownPaymentEnabled={isDownPaymentEnabled}
+            onDownPaymentEnable={setIsDownPaymentEnabled}
+            onSetDownpayment={onSetDownPayment}
             addService={addService}
+            onBranchSelect={onSelectBranch}
             onRemove={handleRemoveFromOrder}
             onUpdateQuantity={handleUpdateQuantity}
           />
@@ -208,7 +241,9 @@ export const Home = () => {
         <>
           <OrderReview
             cart={cart}
+            branch={branchId}
             customerDetails={customerDetails}
+            downPayment={downPayment}
             onBack={() => setStep(1)}
             onPlaceOrder={handlePlaceOrder}
             placingOrder={placingOrder}

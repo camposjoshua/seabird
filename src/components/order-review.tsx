@@ -7,10 +7,13 @@ import {
   Button,
 } from "@heroui/react";
 import type { CartItem, CustomerDetails } from "../services/types/order";
+import { BRANCHES } from "../services/types/branch";
 
 type OrderReviewProps = {
   cart: CartItem[];
+  branch: string;
   customerDetails: CustomerDetails;
+  downPayment: number;
   onBack: () => void;
   onPlaceOrder: () => void;
   placingOrder: boolean;
@@ -19,15 +22,20 @@ type OrderReviewProps = {
 export const OrderReview = ({
   cart,
   customerDetails,
+  downPayment,
+  branch,
   onBack,
   onPlaceOrder,
   placingOrder,
 }: OrderReviewProps) => {
-  const total = cart.reduce(
-    (sum: number, item: { price: number; quantity: number }) =>
-      sum + item.price * item.quantity,
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
     0,
   );
+
+  const appliedDownPayment = Math.min(Math.max(0, downPayment || 0), subtotal);
+
+  const total = subtotal - appliedDownPayment;
 
   return (
     <Surface className="w-full rounded-3xl shadow-surface p-3 mb-4">
@@ -55,6 +63,14 @@ export const OrderReview = ({
       <hr className="mt-3" />
 
       <section className="mb-3">
+        <div className="mt-3">
+          <Header className="w-full text-center">Branch Location</Header>
+          <Typography type="h5" className="w-full text-center">
+            {BRANCHES.find((item) => item.id === branch)?.name ??
+              "Unknown Branch"}
+          </Typography>
+        </div>
+
         <div className="mt-3">
           <Header className="w-full text-center">Selected Services</Header>
         </div>
@@ -86,6 +102,20 @@ export const OrderReview = ({
       </section>
 
       <hr />
+
+      <div className=" flex flex-row justify-between items-center my-3">
+        <div>
+          <Typography className="text-orange-500" type="body-sm">
+            Down payment:
+          </Typography>
+        </div>
+
+        <div>
+          <Typography className="text-orange-500" type="body-sm">
+            - ₱{downPayment}
+          </Typography>
+        </div>
+      </div>
 
       <div className=" flex flex-row justify-between items-center my-3">
         <div>
